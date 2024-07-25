@@ -9,12 +9,28 @@ import * as jwt from '@midwayjs/jwt';
 import { JwtMiddleware } from './middleware/jwt.middleware';
 import { prisma } from './prisma';
 import * as captcha from '@midwayjs/captcha';
+import * as info from '@midwayjs/info';
+import { NotFoundFilter } from './filter/notfound.filter';
+import { DefaultErrorFilter } from './filter/default.filter';
+import { ResponseFormatMiddleware } from './middleware/responseFormat.middleware';
+import * as redis from '@midwayjs/redis';
 
 interface IMoreApp {
   prisma: typeof prisma;
 }
 @Configuration({
-  imports: [egg, axios, validate, jwt, captcha],
+  imports: [
+    egg,
+    redis,
+    jwt,
+    validate,
+    captcha,
+    axios,
+    {
+      component: info,
+      enabledEnvironment: ['local'],
+    },
+  ],
   importConfigs: [join(__dirname, './config')],
 })
 export class ContainerLifeCycle implements ILifeCycle {
@@ -22,8 +38,12 @@ export class ContainerLifeCycle implements ILifeCycle {
   app: Application & IMoreApp;
 
   async onReady() {
-    this.app.useFilter([ValidateErrorFilter]);
-    this.app.useMiddleware([JwtMiddleware]);
+    this.app.useFilter([
+      ValidateErrorFilter,
+      NotFoundFilter,
+      DefaultErrorFilter,
+    ]);
+    this.app.useMiddleware([JwtMiddleware, ResponseFormatMiddleware]);
     this.app.prisma = prisma;
   }
 }

@@ -20,7 +20,7 @@ export class UserDTO {
 }
 
 export class LoginDTO {
-  @Rule(RuleType.string().required().email())
+  @Rule(RuleType.string().email())
   email: string;
 
   @Rule(RuleType.string().required())
@@ -30,6 +30,29 @@ export class LoginDTO {
   // email String  @unique
   // name  String?
   // posts Post[]
+  @Rule(RuleType.string().required())
+  username: string;
+
   @Rule(RuleType.string())
-  name: string;
+  type: string;
+
+  @Rule(RuleType.boolean())
+  autoLogin: boolean;
+
+  @Rule(RuleType.string())
+  captche_id: string;
+
+  @Rule(RuleType.string())
+  answer: string;
+}
+
+export class NewUserDTO {
+  @Rule(RuleType.string().required())
+  userName: string;
+
+  @Rule(RuleType.string().required())
+  passWord: string;
+
+  @Rule(RuleType.string().email().allow(''))
+  email: string;
 }

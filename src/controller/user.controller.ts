@@ -1,15 +1,20 @@
-import { App, Controller, Get, Inject } from '@midwayjs/core';
+import { App, Body, Controller, Get, Inject, Post } from '@midwayjs/core';
 import { Application } from '@midwayjs/web';
 import { prisma } from '../prisma';
 import { Context } from 'egg';
+import { UserService } from '../service/user.service';
+import { NewUserDTO } from '../dto/user';
 
-@Controller('/api')
+@Controller('/api/user')
 export class User {
   @App()
   App: Application;
 
   @Inject()
   ctx: Context;
+
+  @Inject()
+  userService: UserService;
 
   @Get('/get_users')
   async getUserList() {
@@ -33,5 +38,16 @@ export class User {
     </html>
   `;
     // return res;
+  }
+
+  @Post('/create')
+  async createUser(@Body() payload: NewUserDTO) {
+    console.log(11111, payload);
+    return await this.userService.register(payload);
+  }
+
+  @Post('/login')
+  async login(@Body() payload: NewUserDTO) {
+    return await this.userService.logining(payload);
   }
 }

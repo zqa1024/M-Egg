@@ -29,7 +29,7 @@ export class User {
     console.log('options2222', options);
     const user: any = await prisma.user.findUnique({
       where: {
-        id: +options.uid,
+        id: options.uid,
       },
     });
     return user;
@@ -55,11 +55,26 @@ export class User {
   }
   async login(data) {
     console.log('data', data);
-    return prisma.user.findFirst({
+    // return prisma.user.findFirst({
+    //   where: {
+    //     email: data.email,
+    //   },
+    // });
+    const user = await prisma.user.findFirst({
       where: {
-        email: data.email,
+        name: data.username,
       },
     });
+
+    console.log('user>>>>>>', user);
+    if (!user) {
+      throw new Error('用户不存在');
+    }
+
+    if (user?.password !== data?.password) {
+      throw new Error('密码错误');
+    }
+    return user;
   }
   async getUserInfo(data) {
     if (Object.keys(data).length > 1) {

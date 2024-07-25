@@ -39,20 +39,16 @@ export class APIController {
   captchaService: CaptchaService;
 
   @Get('/get_user')
-  async getUser(@Query('uid') uid: string): Promise<IGetUserResponse> {
-    // const user = await this.userService.getUser({ uid });
-    console.log('ctx>>>>>>>', this.ctx);
-
-    let count: number = +this.ctx.cookies.get('count');
+  async getUser(@Query('uid') uid: number): Promise<IGetUserResponse> {
+    let count: string | number = this.ctx.cookies.get('count');
     count = count ? Number(count) : 0;
     this.ctx.cookies.set('count', ++count + '');
 
     const user = await this.User.getUser({ uid });
-    return { success: true, message: 'OK', data: { ...user, count } };
+    return { success: true, data: { ...user, count } };
   }
 
   @Post('/user')
-  // eslint-disable-next-line @typescript-eslint/ban-types
   async createAndUpdateUser(@Body() user: UserDTO): Promise<{}> {
     console.log('user', user);
     const data = await this.User.createUser(user);
@@ -69,17 +65,47 @@ export class APIController {
     return data;
   }
 
-  @Post('/login')
-  async login(@Body() loginData): Promise<object> {
+  @Post('/login/account')
+  async login(@Body() loginData: LoginDTO): Promise<object> {
     const result = this.validateService.validate(LoginDTO, loginData);
+
+    if (result.value) {
+      console.log('result.value', loginData.username);
+      // const passed: boolean = await this.captchaService.check(
+      //   result.value?.captche_id,
+      //   result.value?.answer
+      // );
+      // if (!passed) {
+      //   throw new Error('验证码错误');
+      // }
+    }
     const data = await this.User.login(result?.value);
-    console.log('data', data);
+    console.log('data1111111', data);
     if (data?.id) {
       const token = await this.User.getToken(data);
+      console.log('token', token);
       return {
-        token,
+        status: 'ok',
+        token: token || '',
       };
     }
-    return data;
+    console.log('data222222', data);
+    return {
+      status: 'error',
+    };
+  }
+  @Post('/login/outLogin')
+  async outLogin() {
+    return {
+      status: 'ok',
+    };
+  }
+
+  @Get('/currentUser')
+  async currentUser() {
+    return {
+      status: 'ok',
+      data: this.ctx.user,
+    };
   }
 }

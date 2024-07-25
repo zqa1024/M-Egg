@@ -2,6 +2,11 @@ generator client {
   provider = "prisma-client-js"
 }
 
+generator prismaClassGenerator {
+  provider = "prisma-class-generator"
+  dryRun   = "false"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -11,20 +16,18 @@ model chat {
   id Int @id @default(autoincrement())
 }
 
-model User {
-  id        Int       @id @default(autoincrement())
-  email     String    @unique
+model user {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
   password  String?
   name      String?
   loginedId Int?
-  createAt  DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  posts     Post[]
-  records   records[]
-  logined   logined[]
+  createAt  DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  posts     post[]
 }
 
-model Post {
+model post {
   id        Int      @id @default(autoincrement())
   createAt  DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -33,25 +36,32 @@ model Post {
   published Boolean  @default(false)
   viewCount Int      @default(0)
   authorId  Int?
-  author    User?    @relation(fields: [authorId], references: [id])
+  author    user?    @relation(fields: [authorId], references: [id])
 }
 
 model logined {
-  id        Int     @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
   userId    Int
   sessionId String?
-  token     String?
-  isLogined Boolean @default(false)
-  author    User?    @relation(fields: [userId], references: [id])
-  updatedAt DateTime @updatedAt
+  isLogined Boolean  @default(false)
   createAt  DateTime @default(now())
+  token     String?
+  updatedAt DateTime @updatedAt
 }
 
 model records {
   id        Int      @id @default(autoincrement())
   authorId  Int?
-  author    User?    @relation(fields: [authorId], references: [id])
   createAt  DateTime @default(now())
   updatedAt DateTime @updatedAt
   events    Json[]   @default([])
+}
+
+model user2 {
+  id        Int      @id @default(autoincrement())
+  email     String?  @unique
+  passWord  String
+  userName  String   @unique
+  createAt  DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

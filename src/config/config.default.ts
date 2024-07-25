@@ -11,6 +11,25 @@ export default (appInfo: MidwayAppInfo) => {
     egg: {
       port: 7001,
     },
+    validate: {
+      validationOptions: {
+        allowUnknown: true, // 全局生效
+      },
+    },
+    redis: {
+      client: {
+        port: 16908, // Redis port
+        host: 'redis-16908.c294.ap-northeast-1-2.ec2.cloud.redislabs.com', // Redis host
+        password: 'OQoQPc11fC5IpaFUziwJ4DTqVBqD64gs',
+        // db: 0, // Redis db
+      },
+    },
+    development: {
+      // ignoreDirs: ['src/script/models.ts'],
+      // reloadPattern: ['!**/*', '!src/script/models.ts'],
+      watchDirs: [''],
+      overrideDefault: true,
+    },
     axios: {
       /*  default: {
         // 所有实例复用的配置
